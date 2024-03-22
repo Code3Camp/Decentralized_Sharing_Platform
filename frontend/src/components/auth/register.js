@@ -9,34 +9,41 @@ const Register = () => {
   const [signinRedirect, setsigninRedirect] = useState(false)
 
   const loginRedirect = () => {
-    
+
   }
 
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
+
   const handleSubmit = async (e) => {
-    console.log(e.target.email);
     e.preventDefault();
     axios.post(`http://localhost:3001/signup`, {
       email,
       password
     }).then(
       (res) => {
-        
-          try {
-            if (res) {
-              console.log('User registered successfully');
-            }
-            
-          } catch (error) {
-            console.log(error);
+
+        try {
+          if (res) {
+            console.log('User registered successfully');
           }
 
-          // if (res.data.error) {
-          //   setMessage(res.data.error);
-          // }
+        } catch (error) {
+          console.log(error);
+        }
+
+        // if (res.data.error) {
+        //   setMessage(res.data.error);
+        // }
       },
     );
   }
-  
+
   return (
     <div className="authform img">
       <section class="ftco-section">
@@ -52,11 +59,11 @@ const Register = () => {
                 <h3 class="mb-4 text-center">Have an account?</h3>
                 <form action="#" class="signin-form">
                   <div class="form-group">
-                    <input type="text" value={email} class="form-control" placeholder="Username" required onChange={setEmail(email)}/>
+                    <input onChange={handleEmailChange} type="text" value={email} class="form-control" placeholder="Username" required />
                   </div>
                   <div class="form-group">
-                    <input id="password-field" value={password} type="password" class="form-control" placeholder="Password" required onChange={(e) => setPassword(e.target.password)}/>
-                      <span toggle="#password-field" ></span>
+                    <input onChange={handlePasswordChange} id="password-field" value={password} type="password" class="form-control" placeholder="Password" required />
+                    <span toggle="#password-field" ></span>
                   </div>
                   <div class="form-group">
                     <button type="submit" class="form-control btn btn-primary submit px-3" onClick={(e) => handleSubmit(e)}>Sign Up</button>
@@ -67,10 +74,10 @@ const Register = () => {
                         <input type="checkbox" checked/>
                           <span class="checkmark"></span>
                       </label> */}
-                      <Link to="/login" style={{color: "#fff"}}>Sign In</Link>
+                      <Link to="/login" style={{ color: "#fff" }}>Sign In</Link>
                     </div>
                     <div class="w-50 text-md-right" id="forgot-pass">
-                      <a href="#"  style={{color: "#fff"}}>Forgot Password</a>
+                      <a href="#" style={{ color: "#fff" }}>Forgot Password</a>
                     </div>
                   </div>
                 </form>
