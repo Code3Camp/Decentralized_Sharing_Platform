@@ -11,11 +11,6 @@ const SECRET_KEY = 'tRw5rP&@gTY!7h$e';
 // Sample user database
 const users = [];
 
-const corsOptions = {
-    origin: true,
-    credentials: true
-};
-
 //allow the client to communicate with the api
 app.use(cors());
 
