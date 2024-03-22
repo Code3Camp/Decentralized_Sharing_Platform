@@ -2,13 +2,22 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const cors = require('cors');
 
 const app = express();
-const PORT = 3000;
+const PORT = 3001;
 const SECRET_KEY = 'tRw5rP&@gTY!7h$e';
 
 // Sample user database
 const users = [];
+
+const corsOptions = {
+    origin: true,
+    credentials: true
+};
+
+//allow the client to communicate with the api
+app.use(cors());
 
 // Middleware
 app.use(bodyParser.json());
@@ -16,7 +25,7 @@ app.use(bodyParser.json());
 // Signup endpoint
 app.post('/signup', async (req, res) => {
     const { email, password } = req.body;
-
+    console.log(req.body);
     // Check if email already exists
     if (users.some(user => user.email === email)) {
         return res.status(400).json({ message: 'email already exists' });
