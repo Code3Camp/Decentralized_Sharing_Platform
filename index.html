@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet Connectivity Landing Page</title>
+</head>
+<body>
+    <h1>Welcome to Our Application</h1>
+    <p>Please connect your wallet to continue:</p>
+    <button id="connectWalletBtn">Connect Wallet</button>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', async () => {
+            // Check if MetaMask is installed
+            if (typeof window.ethereum !== 'undefined') {
+                // MetaMask is installed
+                const ethereum = window.ethereum;
+
+                try {
+                    // Requesting access to the user's accounts
+                    await ethereum.request({ method: 'eth_requestAccounts' });
+
+                    // Accounts now exposed
+                    const accounts = await ethereum.request({ method: 'eth_accounts' });
+                    const selectedAccount = accounts[0]; // Assuming only one account is selected
+
+                    // You can now use 'selectedAccount' to interact with the user's wallet
+                    console.log('Connected to wallet. Selected account:', selectedAccount);
+                    
+                    // Redirect to another page or perform other actions after wallet is connected
+                    // window.location.href = 'nextPage.html';
+                } catch (error) {
+                    console.error('Error connecting to wallet:', error);
+                    // Handle error connecting to wallet
+                }
+            } else {
+                // MetaMask is not installed
+                alert('MetaMask extension is not installed. Please install it to continue.');
+            }
+        });
+
+        document.getElementById('connectWalletBtn').addEventListener('click', async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    // Requesting access to the user's accounts
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                    // Accounts now exposed
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                    const selectedAccount = accounts[0]; // Assuming only one account is selected
+
+                    // You can now use 'selectedAccount' to interact with the user's wallet
+                    console.log('Connected to wallet. Selected account:', selectedAccount);
+                    
+                    // Redirect to another page or perform other actions after wallet is connected
+                    // window.location.href = 'nextPage.html';
+                } catch (error) {
+                    console.error('Error connecting to wallet:', error);
+                    // Handle error connecting to wallet
+                }
+            } else {
+                // MetaMask is not installed
+                alert('MetaMask extension is not installed. Please install it to continue.');
+            }
+        });
+    </script>
+</body>
+</html>
