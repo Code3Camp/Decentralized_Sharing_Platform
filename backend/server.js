@@ -2,60 +2,65 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const cors = require('cors');
+const sqlite3 = require('sqlite3').verbose();
 
 const app = express();
 const PORT = 3001;
-const SECRET_KEY = 'tRw5rP&@gTY!7h$e';
+const SECRET_KEY = 'your_secret_key';
+const DB_FILE_PATH = 'users.db';
 
-// Sample user database
-const users = [];
+// Initialize SQLite database
+const db = new sqlite3.Database(DB_FILE_PATH);
 
-//allow the client to communicate with the api
-app.use(cors());
+// Create users table
+db.serialize(() => {
+    db.run("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT UNIQUE, password TEXT)");
+});
 
 // Middleware
 app.use(bodyParser.json());
 
 // Signup endpoint
 app.post('/signup', async (req, res) => {
-    const { email, password } = req.body;
-    console.log(req.body);
-    // Check if email already exists
-    if (users.some(user => user.email === email)) {
-        return res.status(400).json({ message: 'email already exists' });
-    }
+    const { username, password } = req.body;
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Store user details
-    users.push({ email, password: hashedPassword });
+    // Insert user into database
+    db.run("INSERT INTO users (username, password) VALUES (?, ?)", [username, hashedPassword], function (err) {
+        if (err) {
+            return res.status(400).json({ message: 'Username already exists or invalid input' });
+        }
 
-    res.status(201).json({ message: 'User created successfully' });
+        res.status(201).json({ message: 'User created successfully' });
+    });
 });
 
 // Login endpoint
 app.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    // Find user by email
-    const user = users.find(user => user.email === email);
+    // Find user by username
+    db.get("SELECT * FROM users WHERE username = ?", [username], async (err, row) => {
+        if (err) {
+            return res.status(500).json({ message: 'Internal server error' });
+        }
 
-    // Check if user exists
-    if (!user) {
-        return res.status(401).json({ message: 'Invalid email or password' });
-    }
+        if (!row) {
+            return res.status(401).json({ message: 'Invalid username or password' });
+        }
 
-    // Check password
-    if (await bcrypt.compare(password, user.password)) {
-        // Generate JWT token
-        const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: '1h' });
+        // Check password
+        if (await bcrypt.compare(password, row.password)) {
+            // Generate JWT token
+            const token = jwt.sign({ username }, SECRET_KEY, { expiresIn: '1h' });
 
-        return res.json({ token });
-    } else {
-        return res.status(401).json({ message: 'Invalid email or password' });
-    }
+            return res.json({ token });
+        } else {
+            return res.status(401).json({ message: 'Invalid username or password' });
+        }
+    });
 });
 
 // Protected route
@@ -76,7 +81,7 @@ function verifyToken(req, res, next) {
             return res.status(401).json({ message: 'Failed to authenticate token' });
         }
 
-        req.email = decoded.email;
+        req.username = decoded.username;
         next();
     });
 }
